@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * @author Tomas Novotny
+ * @author Toonu NoU
  */
 public class AnalysedCraft {
     private ArrayList<String> parts;

@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="KSP-NoU-Craft Analyzer" />
+        <module name="KSP-NoU-CraftAnalyzer" />
         <module name="NoU-Craft Analyser" />
         <module name="KSP-NoU-Craft Analyser" />
       </profile>

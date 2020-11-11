@@ -32,14 +32,14 @@ public class Loader {
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Craft Analyser");
+            JFrame frame = new JFrame("Map Analyser");
 
             JFileChooser jfc = new JFileChooser();
             jfc.setBackground(BACKGROUND);
             jfc.setForeground(FOREGROUND);
             jfc.setApproveButtonText("Analyse Craft");
 
-            jfc.addChoosableFileFilter(new FileNameExtensionFilter("Craft Files","craft"));
+            jfc.addChoosableFileFilter(new FileNameExtensionFilter("Map Files","xml"));
             jfc.setAcceptAllFileFilterUsed(false);
 
             if (path == null) {
@@ -68,14 +68,15 @@ public class Loader {
                         e.printStackTrace();
                     }
 
-                    AnalysedCraft newCraft = getParts(file);
+                    getParts(file);
 
                     Object[] options = {"Show Details", "Close"};
 
+                    /**
                     if (JOptionPane.showOptionDialog(frame, newCraft, "Analyzer",
                             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) == 0) {
                         JOptionPane.showMessageDialog(frame, newCraft.toPartString());
-                    }
+                    }**/
                 }
             });
 
@@ -97,48 +98,19 @@ public class Loader {
     /**
      * Method makes String of parts from .craft file.
      * @param file .craft file to analyse.
-     * @return String to print.
      */
-    private static AnalysedCraft getParts(File file) {
+    private static void getParts(File file) {
         ArrayList<String> parts = new ArrayList<>();
-        int counter = 0;
-        int missileCounter = 0;
-        int gunCounter = 0;
-        int hardpoints = 0;
-        int avionics = 0;
-        String craftName = null;
+        StringBuilder export = new StringBuilder();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            int internalcounter = 0;
             String line = br.readLine();
             while (line != null) {
-                if (Pattern.matches(".*part = .*", line)) {
-                    line = line.trim();
-                    line = line.substring(7, line.length()-11);
-                    parts.add(line);
-                    internalcounter += line.length();
-                    if (internalcounter > 40) {
-                        parts.add("\n");
-                        internalcounter = 0;
-                    }
-                    ++counter;
-                    if (Pattern.matches(".*bahaAdjustableRail.*", line)) {
-                        hardpoints += 3;
-                    }
-                }
-
-                if (Pattern.matches(".*name = MissileLauncher.*", line)) {
-                    ++missileCounter;
-                } else if (Pattern.matches(".*name = ModuleWeapon.*", line)) {
-                    ++gunCounter;
-                } else if (Pattern.matches(".*name = ModuleRadar.*", line) ||
-                        Pattern.matches("name = CM.....", line) ||
-                Pattern.matches(".*ModuleECMJammer.*", line) || Pattern.matches(".*ModuleTargetingCamera.*", line)) {
-                    ++avionics;
-                }
-                if (Pattern.matches(".*ship = .*", line)) {
-                    line = line.trim();
-                    craftName = line.substring(7);
+                if (Pattern.matches(".*Pec-.*", line)) {
+                    String[] splitString = line.split(" ");
+                    export.append(splitString[7]+splitString[8]+splitString[9]+splitString[10]);
+                } else {
+                    export.append(line);
                 }
                 line = br.readLine();
             }
@@ -146,7 +118,6 @@ public class Loader {
             parts.add(String.format("[ERR %s] Error initializing stream. Exception: %s",
                     LocalTime.now().truncatedTo(ChronoUnit.SECONDS), e));
         }
-        return new AnalysedCraft(parts, counter, missileCounter, gunCounter, hardpoints, avionics, craftName);
     }
 
     public static File getPath() {
