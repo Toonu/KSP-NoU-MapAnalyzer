@@ -106,12 +106,50 @@ public class Loader {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line = br.readLine();
             while (line != null) {
+                String value = null;
+                String id = null;
+                String style = null;
+                String parent = null;
+                String vertex = null;
+                String other = "";
+
                 if (Pattern.matches(".*Pec-.*", line)) {
                     String[] splitString = line.split(" ");
-                    export.append(splitString[7]+splitString[8]+splitString[9]+splitString[10]);
+
+                    for (int i = 0; i < splitString.length; i++) {
+                        if (splitString[i].length() > 0) {
+                            if (splitString[i].startsWith("id")) {
+                                id = splitString[i];
+                                break;
+                            }
+                            if (splitString[i].startsWith("value")) {
+                                value = splitString[i];
+                                break;
+                            }
+                            if (splitString[i].startsWith("style")) {
+                                style = splitString[i];
+                                break;
+                            }
+                            if (splitString[i].startsWith("parent")) {
+                                parent = splitString[i];
+                                break;
+                            }
+                            if (splitString[i].startsWith("vertex")) {
+                                vertex = splitString[i];
+                                break;
+                            } else {
+                                other += splitString[i];
+                            }
+                        }
+                    }
+                    export.append("\n");
                 } else {
-                    export.append(line);
+                    export.append(line + '\n');
                 }
+                if (other.length() > 0) {
+                    System.out.println(other);
+                }
+
                 line = br.readLine();
             }
         } catch (IOException e) {
