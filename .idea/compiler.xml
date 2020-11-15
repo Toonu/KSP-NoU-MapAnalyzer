@@ -6,10 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="KSP-NoU-Craft Analyzer" />
+        <module name="CraftAnalyzer" />
         <module name="KSP-NoU-CraftAnalyzer" />
-        <module name="NoU-Craft Analyser" />
         <module name="KSP-NoU-Craft Analyser" />
+        <module name="KSP-NoU-Craft Analyzer" />
+        <module name="NoU-Craft Analyser" />
+        <module name="KSP-NoU-MapAnalyzer" />
       </profile>
     </annotationProcessing>
   </component>

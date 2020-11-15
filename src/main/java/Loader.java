@@ -1,9 +1,11 @@
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.Color;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowEvent;
-import java.awt.GraphicsDevice;
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +15,12 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import java.io.*;
+import java.util.*;
+import org.jdom2.*;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * @author Toonu NoU
@@ -68,7 +76,33 @@ public class Loader {
                         e.printStackTrace();
                     }
 
-                    getParts(file);
+                    SAXBuilder saxBuilder = new SAXBuilder();
+                    try {
+                        Document document = saxBuilder.build(file);
+                        Element units = (Element) document.getRootElement().getContent(1);
+                        units = (Element) units.getContent(1);
+                        units = (Element) units.getContent(1);
+
+                        for (Content item: units.getContent()) {
+                            if (item instanceof Element) {
+                                if (((Element) item).getAttribute("value") != null && ((Element) item).getAttribute("value").toString().length() > 30) {
+                                    System.out.println(((Element) item).getAttribute("value").toString());
+                                }
+                            }
+                        }
+
+
+
+
+
+                        //Finalization
+                        XMLOutputter xmlOutput = new XMLOutputter();
+                        xmlOutput.setFormat(Format.getPrettyFormat());
+                        xmlOutput.output(document,  new FileOutputStream("Test.xml"));
+
+                    } catch (JDOMException | IOException e) {
+                        e.printStackTrace();
+                    }
 
                     Object[] options = {"Show Details", "Close"};
 
@@ -93,73 +127,6 @@ public class Loader {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
         });
-    }
-
-    /**
-     * Method makes String of parts from .craft file.
-     * @param file .craft file to analyse.
-     */
-    private static void getParts(File file) {
-        ArrayList<String> parts = new ArrayList<>();
-        StringBuilder export = new StringBuilder();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line = br.readLine();
-            while (line != null) {
-                String value = null;
-                String id = null;
-                String style = null;
-                String parent = null;
-                String vertex = null;
-                String other = "";
-
-                if (Pattern.matches(".*Pec-.*", line)) {
-                    String[] splitString = line.split(" ");
-
-                    for (int i = 0; i < splitString.length; i++) {
-                        if (splitString[i].length() > 0) {
-                            if (splitString[i].startsWith("id")) {
-                                id = splitString[i];
-                                break;
-                            }
-                            if (splitString[i].startsWith("value")) {
-                                value = splitString[i];
-                                break;
-                            }
-                            if (splitString[i].startsWith("style")) {
-                                style = splitString[i];
-                                break;
-                            }
-                            if (splitString[i].startsWith("parent")) {
-                                parent = splitString[i];
-                                break;
-                            }
-                            if (splitString[i].startsWith("vertex")) {
-                                vertex = splitString[i];
-                                break;
-                            } else {
-                                other += splitString[i];
-                            }
-                        }
-                    }
-                    export.append("\n");
-                } else {
-                    export.append(line + '\n');
-                }
-                if (other.length() > 0) {
-                    System.out.println(other);
-                }
-
-                line = br.readLine();
-            }
-        } catch (IOException e) {
-            parts.add(String.format("[ERR %s] Error initializing stream. Exception: %s",
-                    LocalTime.now().truncatedTo(ChronoUnit.SECONDS), e));
-        }
-    }
-
-    public static File getPath() {
-        return path;
     }
 
     public static void setPath(File path) {
